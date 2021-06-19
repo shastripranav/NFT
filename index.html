@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script  src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.22/dist/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" charset="utf-8"></script>
+
+    <script>
+      $(document).ready(function (){
+        window.ethereum.enable();
+        web3 = new Web3(web3.currentProvider);
+        var addr ="" ;
+        var abi = ;
+        web3.eth.getAccounts().then( function(accounts){
+           acc = accounts[0];
+          document.getElementById("address").innerHTML = acc;
+        }).then(function(tx){
+          console.log(tx);
+        }).catch(function(tx){
+          console.log(tx);
+        });
+        contract = new web3.eth.Contract(abi,addr);
+
+        contract.methods.totalSupply().call().then(function(ans){
+           document.getElementById("total_supply").innerHTML = ans[0];
+        });
+
+        $("#display").click(async function (){
+
+                        var row = parseInt($("#total_supply").text());
+                        var tab;
+                        tab = "<table border = 1 style = 'width:70%;'><tr style = 'width:30%; height : 50px;'><th style = 'width:30%;'>Token Id</th><th style = 'width:30%;'>Token No</th><th>Color</th></tr>"
+                        for(i=0;i<row;i++){
+                          await contract.methods.colors(i).call().then(function(ans){
+                            tab = tab +"<tr style = 'height : 75px;'> <td align = 'center'> "+(i+1)+"</td><td align = 'center'> "+ans+"</td><td bgcolor = "+ans+"></td></tr>";
+
+                          });
+                        }
+                        tab = tab+"</table>"
+                        document.getElementById("Data").innerHTML = tab;
+                      })
+
+    $("#Token_create").click(function (){
+                var color = $("#col_name").val();
+                 contract.methods.mint(color).send({from:acc}).then(function(){
+                           alert("Token Minted");
+                 });
+              })
+    });
+
+    </script>
+    <title></title>
+  </head>
+  <body>
+    <div style ='align : left;'> <h1>The is our first nft application</h1></div>
+    <div style ='align : right;'>
+      <p id ="address"> </p>
+      Total Supply : <label id ='total_supply'></label>
+    </div>
+
+    <div >
+      Enter the Colour of the token : <input type="text" id="col_name">
+
+      <br><br><br><br>
+      <button id="Token_create">Mint Token</button>
+      <button id = "display"> Display Tokens</button>
+    </div>
+    <div >
+      <p id="Data"></p>
+    </div>
+
+  </body>
+</html>
